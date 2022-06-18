@@ -25,6 +25,11 @@ public class LoginCheckFilter implements Filter {
     private final String[] anonymousUrl = new String[] {
         "/api/student/register",
         "/api/student/login/**",
+        // 接口文档相关
+        "/api/*.html",
+        "/api/webjars/**",
+        "/api/swagger-resources/**",
+        "/api/v2/api-docs/**"
     };
 
     @Override
