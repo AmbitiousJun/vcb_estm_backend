@@ -1,0 +1,17 @@
+server:
+  port: 9001 # 服务端口
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        max-age: 24h
+      timeout: 24h
+spring:
+  application:
+    name: vcb_estm_backend
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://101.33.225.246:3306/db_vcb_estm?serverTimeZone=Asia/Shanghai
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
