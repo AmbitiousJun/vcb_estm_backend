@@ -4,17 +4,18 @@ import com.ambitious.vcbestm.common.CommonResult;
 import com.ambitious.vcbestm.exception.ErrCode;
 import com.ambitious.vcbestm.exception.ServiceException;
 import com.ambitious.vcbestm.filter.LocalUser;
+import com.ambitious.vcbestm.pojo.dto.StudentLoginDTO;
+import com.ambitious.vcbestm.pojo.dto.StudentModifyDTO;
+import com.ambitious.vcbestm.pojo.dto.StudentRegisterDTO;
 import com.ambitious.vcbestm.pojo.po.EstimateHistory;
 import com.ambitious.vcbestm.pojo.po.Student;
 import com.ambitious.vcbestm.pojo.vo.StudentLoginRes;
 import com.ambitious.vcbestm.service.EstimateHistoryService;
 import com.ambitious.vcbestm.service.StudentService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -40,6 +41,11 @@ public class StudentController {
     @ApiImplicitParams({
         @ApiImplicitParam(name="uid",value="用户id",required=true,paramType="path",dataType="Long")
     })
+    @ApiResponses({
+        @ApiResponse(code = 2000, message = "请求成功"),
+        @ApiResponse(code = 4012, message = "非法请求"),
+        @ApiResponse(code = 4002, message = "用户不存在")
+    })
     @GetMapping("/{uid}")
     public CommonResult<Student> findById(@PathVariable Long uid) {
         if (!isLegalUser(uid)) {
@@ -56,6 +62,10 @@ public class StudentController {
     @ApiImplicitParams({
         @ApiImplicitParam(name="uid",value="用户id",required=true,paramType="path",dataType="Long")
     })
+    @ApiResponses({
+        @ApiResponse(code = 2000, message = "请求成功"),
+        @ApiResponse(code = 4012, message = "非法请求")
+    })
     @GetMapping("/estimate/history/{uid}")
     public CommonResult<List<EstimateHistory>> estimateHistory(@PathVariable Long uid) {
         if (!isLegalUser(uid)) {
@@ -66,22 +76,42 @@ public class StudentController {
     }
 
     @ApiOperation("修改用户信息")
+    @ApiResponses({
+        @ApiResponse(code = 2000, message = "请求成功"),
+        @ApiResponse(code = 4001, message = "参数不足"),
+        @ApiResponse(code = 4002, message = "用户不存在"),
+        @ApiResponse(code = 4002, message = "用户不存在"),
+        @ApiResponse(code = 4013, message = "姓名长度在 2 到 10 之间"),
+        @ApiResponse(code = 4008, message = "姓名已存在"),
+        @ApiResponse(code = 5000, message = "服务器异常"),
+    })
     @PutMapping("/modify")
-    public CommonResult<String> modifyInfo(@RequestBody Student student) {
+    public CommonResult<String> modifyInfo(@RequestBody StudentModifyDTO dto) {
+        Student student = new Student();
+        student.setId(dto.getUserId());
+        student.setStuName(dto.getStuName());
+        student.setPets3Grade(dto.getPets3Grade());
+        student.setPets4Grade(dto.getPets4Grade());
         studentService.modifyInfo(student);
         return CommonResult.ok("修改成功");
     }
 
     @ApiOperation("注销登录")
+    @ApiResponses({
+        @ApiResponse(code = 2000, message = "请求成功")
+    })
     @PostMapping("/logout")
-    public CommonResult<String> logout(HttpSession session) {
+    public CommonResult<String> logout(@ApiIgnore HttpSession session) {
         session.invalidate();
         return CommonResult.ok("注销成功");
     }
 
     @ApiOperation("（匿名）检查用户当前是否处于登录状态")
+    @ApiResponses({
+        @ApiResponse(code = 2000, message = "请求成功")
+    })
     @GetMapping("/login/check")
-    public CommonResult<?> checkLogin(HttpSession session) {
+    public CommonResult<?> checkLogin(@ApiIgnore HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return CommonResult.ok("未登录");
@@ -90,16 +120,39 @@ public class StudentController {
     }
 
     @ApiOperation("（匿名）用户注册")
+    @ApiResponses({
+        @ApiResponse(code = 2000, message = "请求成功"),
+        @ApiResponse(code = 4001, message = "参数不足"),
+        @ApiResponse(code = 4004, message = "学号长度在 4 到 20 之间"),
+        @ApiResponse(code = 4005, message = "学号不能包含特殊字符"),
+        @ApiResponse(code = 4006, message = "密码长度在 8 到 20 之间"),
+        @ApiResponse(code = 4007, message = "密码不能包含特殊字符"),
+        @ApiResponse(code = 4013, message = "姓名长度在 2 到 10 之间"),
+        @ApiResponse(code = 4008, message = "姓名已存在"),
+        @ApiResponse(code = 5000, message = "服务器异常"),
+    })
     @PostMapping("/register")
-    public CommonResult<String> register(@RequestBody Student student) {
+    public CommonResult<String> register(@RequestBody StudentRegisterDTO dto) {
+        Student student = new Student();
+        student.setStuNum(dto.getStuNum());
+        student.setStuName(dto.getStuName());
+        student.setPassword(dto.getPassword());
         studentService.register(student);
         return CommonResult.ok("注册成功");
     }
 
     @ApiOperation("（匿名）用户登录")
+    @ApiResponses({
+        @ApiResponse(code = 2000, message = "请求成功"),
+        @ApiResponse(code = 4001, message = "参数不足"),
+        @ApiResponse(code = 4009, message = "用户名或密码错误"),
+    })
     @PostMapping("/login")
-    public CommonResult<StudentLoginRes> login(@RequestBody Student student,
-                                               HttpSession session) {
+    public CommonResult<StudentLoginRes> login(@RequestBody StudentLoginDTO dto,
+                                               @ApiIgnore HttpSession session) {
+        Student student = new Student();
+        student.setStuNum(dto.getStuNum());
+        student.setPassword(dto.getPassword());
         StudentLoginRes res = studentService.login(student, session);
         return CommonResult.ok(res);
     }
