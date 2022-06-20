@@ -1,0 +1,8 @@
+com\ambitious\vcbestm\entity\BatchResult.class
+com\ambitious\vcbestm\service\EstimateServiceTest.class
+com\ambitious\vcbestm\DbTest.class
+com\ambitious\vcbestm\JwtTest.class
+com\ambitious\vcbestm\BatchTest.class
+com\ambitious\vcbestm\DbTest$1.class
+com\ambitious\vcbestm\entity\BatchResult$SingleWordResult.class
+com\ambitious\vcbestm\FileTest.class
