@@ -27,7 +27,7 @@ import java.util.Scanner;
  * @author Ambitious
  * @date 2022/6/13 20:59
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Slf4j
 public class DbTest {
 
@@ -38,7 +38,7 @@ public class DbTest {
     @Resource
     private VocabularyMapper vocabularyMapper;
 
-    private static final Long curTag = 7L;
+    private static final Long curTag = 9L;
 
     @Test
     void testInsert() {
@@ -69,7 +69,7 @@ public class DbTest {
 
     @Test
     void testInsertWords() {
-        String path = "word_data/pets_5.txt";
+        String path = "word_data/GRE词汇精选乱序版.txt";
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
         Assertions.assertNotNull(is);
         Scanner scanner = new Scanner(is);
